@@ -25,3 +25,7 @@ lightning_logs/
 
 .DS_Store
 .ipynb_checkpoints/
+
+# local tooling state
+.omc/
+.claude/
