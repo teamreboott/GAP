@@ -1,0 +1,23 @@
+GAP: Geometry-Aware Pointer Loss for Table Structure Recognition
+Copyright (c) 2026 Teamreboott Inc.
+
+This work is a derivative of TFLOP (Table Structure Recognition Framework
+with Layout Pointer Mechanism), IJCAI 2024, by Minsoo Khang and Teakgyu Hong.
+
+  Original repository: https://github.com/UpstageAI/TFLOP
+  Original paper:      https://www.ijcai.org/proceedings/2024/0105.pdf
+  Original license:    Creative Commons Attribution-NonCommercial 4.0
+                       International (CC BY-NC 4.0)
+
+The upstream TFLOP code is licensed CC BY-NC 4.0, which permits use and
+redistribution for NonCommercial purposes only and requires derivative works
+to carry the same notice. This repository is therefore released under the
+same CC BY-NC 4.0 license.
+
+Modifications made in this repository relative to upstream TFLOP:
+  - Added the Geometry-Aware Pointer (GAP) loss
+    (tflop/model/decoder/mbart_decoder_weighted.py) and its integration
+    into the pointer loss path (tflop/model/decoder/mbart_decoder.py).
+  - Added GAP configuration keys to config/exp_configs/general_exp.yaml.
+  - Removed experiment/analysis scripts not required for training or
+    inference.

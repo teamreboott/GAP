@@ -1,0 +1,88 @@
+# SynthTabNet minimal test configuration
+#-----------------------------------------#
+# Data batch config
+train_batch_size: 1
+val_batch_size: 1
+test_batch_size: 1
+accumulate_grad_batches: 1
+
+# Exp. mode config
+use_OTSL: True  # MUST be True for TFLOP
+add_row_col_prefix: False
+add_row_cnt_supervision: False
+add_col_cnt_supervision: False
+use_ColConLoss: False
+use_imgRoiAlign: False
+
+# Contrast. Learning Config - all disabled
+use_isEmptyFilled_contLearning: False
+use_isTheadTbody_contLearning: False
+use_RowWise_contLearning: False
+use_ColWise_contLearning: False
+use_CellWise_contLearning: False
+span_coeff_mode: "proportional"
+
+# Augmentation configs
+shuffle_cell_bbox_rate: 0.0
+add_watermark: False
+empty_cell_ptr_loss_coeff: 0.5
+non_empty_cell_ptr_loss_coeff: 0.5
+
+# Exp. training configs
+lr: 5e-5
+max_epochs: -1
+max_steps: 2  # Just 2 steps for testing
+warmup_steps: null
+
+# Experiment identification
+exp_name: synthtabnet_test
+exp_version: synthtabnet_test
+result_path: results
+
+# Checkpoint & path configurations
+pretrained_tokenizer_name_or_path: "hyunwoongko/asian-bart-ecjk"
+pretrained_model_name_or_path: "pretrain_weights/donut-base"
+resume_from_checkpoint_path: null
+
+#-----Fixed for all experiments-----#
+dataset_script_path: tflop.datamodule.datasets.tflop
+dataset_class_name: TFLOPDataset
+num_training_samples_per_epoch: 480346
+drop_bbox_rate: 0.0
+mask_text_box: False
+curriculum_stage: False
+max_num_row: 40
+max_num_col: 40
+use_fast_decoder: False
+use_ptr_decoder: True
+
+seed: 42
+num_workers: 0
+val_check_interval: 1.0
+check_val_every_n_epoch: 10
+gradient_clip_val: 1.0
+num_nodes: 1
+strategy: "auto"
+
+special_chars:
+  - rowspan="
+  - colspan="
+  - '<td '
+  - <tr>
+  - </tbody>
+  - </td>
+  - <thead>
+  - <tbody>
+  - </tr>
+  - </thead>
+  - <td>
+  - <sep/>
+  - <s_answer>
+  - </s_answer>
+  - C-tag
+  - U-tag
+  - L-tag
+  - X-tag
+  - NL-tag
+  - R-tag
+  - <CELL>

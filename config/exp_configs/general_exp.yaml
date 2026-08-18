@@ -1,0 +1,107 @@
+# General experiment related configurations
+#-----------------------------------------#
+# Data batch config
+train_batch_size: 12 # could vary by dataset depending on GPU Mem.
+val_batch_size: 16
+test_batch_size: 1
+accumulate_grad_batches: 1
+
+# Exp. mode config
+use_OTSL: False
+add_row_col_prefix: False
+add_row_cnt_supervision: False
+add_col_cnt_supervision: False
+use_ColConLoss: False
+use_imgRoiAlign: False
+
+# Contrast. Learning Config
+use_isEmptyFilled_contLearning: False
+use_isTheadTbody_contLearning: False
+use_RowWise_contLearning: False
+use_ColWise_contLearning: False
+use_CellWise_contLearning: False
+span_coeff_mode: "proportional"
+
+# Augmentation configs
+shuffle_cell_bbox_rate: 0.0
+add_watermark: False
+empty_cell_ptr_loss_coeff: 0.5
+non_empty_cell_ptr_loss_coeff: 0.5
+
+# Exp. training configs두
+lr: 2e-5
+max_epochs: -1
+max_steps: 1000000
+warmup_steps: null
+
+# Placeholder configurations
+exp_name: <FIXME>
+exp_version: <FIXME>
+result_path: <FIXME>
+
+# Checkpoint & path configurations
+pretrained_tokenizer_name_or_path: "hyunwoongko/asian-bart-ecjk" 
+pretrained_model_name_or_path: "donut-base-finetuned-cord-v2"
+new_vocab_size: 58400  # Donut base (57580) + bbox tokens (768) + special tokens (52)
+resume_from_checkpoint_path: null
+
+#-----Fixed for all experiments-----#
+dataset_script_path: tflop.datamodule.datasets.tflop
+dataset_class_name: TFLOPDataset
+num_training_samples_per_epoch: 480346 # Does not seem to be used anymore
+drop_bbox_rate: 0.0 # Does not seem to be used anymore
+mask_text_box: False
+curriculum_stage: False
+max_num_row: 40 # TODO: Potentially needed for colconloss
+max_num_col: 40 # TODO: Potentially needed for colconloss
+use_fast_decoder: False
+use_ptr_decoder: True # NOTE: This needs to be set to false for non-pointer baseline models
+
+# Grid Positional Encoding Configuration
+use_row_col_embedding: False  # Set to True to enable grid positional encoding for C,L,X,U tags
+row_col_embedding_config:
+  row_embedding_dim: 128  # Dimension for row embedding
+  col_embedding_dim: 128  # Dimension for col embedding
+
+# Geometry-Aware Pointer (GAP) loss configuration
+# w(d) = max(alpha / 2**d, min_weight)  ->  4, 2, 1, 0.5 for d = 1..4
+use_adjacent_penalty: True   # True enables GAP loss; False = standard pointer CE
+adjacent_penalty_config:
+  alpha: 8.0                 # base weight scale (paper: alpha = 8)
+  min_weight: 0.5            # floor for distant candidates (d >= 5)
+  temperature: 0.1
+  use_spatial_weights: True
+  use_mass_normalization: True
+  use_logitnorm: True
+  kappa: 1.0                 # total negative mass after normalisation
+
+seed: 42
+num_workers: 4
+val_check_interval: 1.0
+check_val_every_n_epoch: 1
+gradient_clip_val: 1.0
+num_nodes: 1
+strategy: "ddp" # choices: ["ddp", "deepspeed_stage_2", ddp_find_unused_parameters_true]
+
+special_chars:
+  - rowspan="
+  - colspan="
+  - '<td '
+  - <tr>
+  - </tbody>
+  - </td>
+  - <thead>
+  - <tbody>
+  - </tr>
+  - </thead>
+  - <td>
+  - <sep/>
+  - <s_answer>
+  - </s_answer>
+  - C-tag
+  - U-tag
+  - L-tag
+  - X-tag
+  - NL-tag
+  - R-tag
+  - <CELL>

@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# checkpoints & experiment outputs
+results/
+outputs/
+*.ckpt
+*.pt
+*.pth
+
+# data & pretrained weights
+data/
+dataset/
+TFLOP-dataset/
+pretrain_weights/
+donut-base-finetuned-cord-v2/
+
+# logs
+*.log
+wandb/
+lightning_logs/
+
+.DS_Store
+.ipynb_checkpoints/
