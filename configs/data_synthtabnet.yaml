@@ -1,7 +1,7 @@
 # SynthTabNet dataset specific configurations
 #-------------------------------#
-image_path: /home/work/.nas/synthtabnet
-meta_data_path: /home/work/.nas/synthtabnet/meta_data
+image_path: ./data/synthtabnet            # <- set to your dataset path
+meta_data_path: ./data/synthtabnet/meta_data  # <- set to your dataset path
 
 input_size:
   height: 768

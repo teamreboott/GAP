@@ -55,6 +55,34 @@ Position Accuracy (PA), a strict cell-level correctness metric:
 | TFLOP | 91.80 | 98.75 |
 | **+ GAP Loss** | **92.35** | **99.31** |
 
+## Repository layout
+
+```
+GAP/
+├── train.py                  # training entrypoint
+├── test.py                   # inference over a test split
+├── evaluate_ted.py           # TEDS / TEDS-Struct scoring
+├── configs/
+│   ├── general_exp.yaml      # model + GAP loss settings
+│   ├── data_pubtabnet.yaml   # PubTabNet paths
+│   └── data_synthtabnet.yaml # SynthTabNet paths
+├── scripts/
+│   ├── train_pubtabnet.sh
+│   ├── train_synthtabnet.sh
+│   ├── eval_pubtabnet.sh
+│   └── report_metrics.py     # TEDS / TEDS-S / PA summary
+└── tflop/
+    ├── model/
+    │   ├── decoder/
+    │   │   ├── mbart_decoder.py           # pointer loss path
+    │   │   └── mbart_decoder_weighted.py  # GAP loss
+    │   ├── model/                         # TFLOP model + config
+    │   └── visual_encoder/                # Swin backbone
+    ├── datamodule/                        # datasets & preprocessing
+    ├── lightning_module/                  # training loop
+    └── evaluator.py                       # TEDS implementation
+```
+
 ## Installation
 
 ```bash
@@ -78,7 +106,7 @@ git clone https://huggingface.co/datasets/upstage/TFLOP-dataset
 ```
 
 Then point `image_path` and `meta_data_path` in
-`config/exp_configs/data_pubtabnet.yaml` at the extracted directories.
+`configs/data_pubtabnet.yaml` at the extracted directories.
 
 PubTabNet's test split ships without ground-truth cell bounding boxes, so
 evaluation uses the pre-extracted OCR boxes released with TFLOP.
@@ -86,7 +114,22 @@ evaluation uses the pre-extracted OCR boxes released with TFLOP.
 ## Training
 
 ```bash
-python train.py --config config/exp_configs/general_exp.yaml
+# TFLOP + GAP on PubTabNet (2 GPUs by default)
+DEVICES="[0,1]" scripts/train_pubtabnet.sh
+
+# SynthTabNet
+DEVICES="[0,1]" scripts/train_synthtabnet.sh
+```
+
+Or call `train.py` directly — it merges an experiment config, a data config, and
+any `key=value` overrides from the command line:
+
+```bash
+python3 train.py \
+  --exp_config  configs/general_exp.yaml \
+  --data_config configs/data_pubtabnet.yaml \
+  exp_name=pubtabnet_gap result_path=results \
+  use_adjacent_penalty=True devices="[0,1]"
 ```
 
 GAP is controlled entirely from the config:
@@ -112,8 +155,18 @@ Paper configuration: input 768×768, batch size 64, `lambda_1 = lambda_2 = 1.0`,
 ## Inference & Evaluation
 
 ```bash
-python test.py --config config/exp_configs/general_exp.yaml \
-               --checkpoint_path <path/to/checkpoint.ckpt>
+DATA_ROOT=./data/TFLOP-dataset \
+scripts/eval_pubtabnet.sh results/pubtabnet_gap/<version> <epoch_step_checkpoint>
+```
+
+This runs inference (`test.py`), computes tree-edit-distance scores
+(`evaluate_ted.py`), and prints the summary:
+
+```
+checkpoint : results/pubtabnet_gap/.../epoch_30_step_117425
+TEDS       : 96.49
+TEDS-Struct: 98.28
+PA         : 92.35
 ```
 
 Reported metrics are TEDS, TEDS-Struct, and Position Accuracy (PA). PA counts a
